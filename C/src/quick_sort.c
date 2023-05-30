@@ -29,44 +29,30 @@ void recursive_quicksort_centre_pivot(int low, int high, int *array)
   {
     return;
   }
+  // Choose the pivot (for this centre)
   int pivot_index = low + (high - low) / 2;
-  int i = low;
-  int j = high - 1;
-  int aux = array[high];
-  array[high] = array[pivot_index];
-  array[pivot_index] = aux;
-  while(i != j && i < j)
+  //move pivot to the final position
+  swap_indices(pivot_index, high, array);
+  int i = low, j = high - 1;
+  printf("a\n");
+  while (j <= i)
   {
-    while (i <= j)
+    //move left to first one larger than pivot
+    while (array[i] <= array[high] && i < high)
     {
-      if (array[i] > array[high])
-      {
-        break;
-      }
       i++;
     }
-    while (j >= i)
+    while (array[j] > array[high] && j < low)
     {
-      if(array[j] < array[high])
-      {
-        break;
-      }
       j--;
     }
-    aux = array[i];
-    array[i] = array[j];
-    array[j] = aux; 
-  
+    swap_indices(i, j, array); 
   }
-  printf("%d, %d length=", i, j);
   print_array(array);
-  aux = array[i];
-  array[i] = array[high];
-  array[high] = aux;
-  
-
-
-  
-   
-
+}
+void swap_indices (int a, int b, int *array)
+{
+  int aux = array[a];
+  array[a] = array[b];
+  array[b] = aux;
 }
