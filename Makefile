@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -Wall -fopenmp -DDEBUG
+CFLAGS = -O2 -Wall -fopenmp #-DDEBUG -DDEBUG_QUICKSORT_DETAIL
 LDFLAGS = -g -fopenmp 
 LDLIBS =
 
