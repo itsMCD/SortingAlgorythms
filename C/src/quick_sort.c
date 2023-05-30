@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
   int *sort_me = NULL;
-  read_file("input_file", &sort_me);
+  create_random_array(10024, &sort_me);
   quick_sort_serial(sort_me);
 }
 
