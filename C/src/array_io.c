@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#define MAX_RANDOM_SIZE 1000
+#include "array_io.h"
 /**
  * Reads a file where the first entry is the size of the file and the rest is all integers that are read into an array
  * @param filename: The name of the file to be read
@@ -74,13 +74,4 @@ void create_random_array(int size, int **array)
   {
     (*array)[i] = rand() % MAX_RANDOM_SIZE;
   }
-}
-
-int main()
-{
-  int *a = NULL;
-  create_random_array(512, &a);
-  print_array(a);
-  free(a);
-  return 0;
 }
