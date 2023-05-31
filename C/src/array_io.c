@@ -75,3 +75,19 @@ void create_random_array(int size, int **array)
     (*array)[i] = rand() % MAX_RANDOM_SIZE;
   }
 }
+
+void copy_array(int *in, int **out)
+{
+  *out = malloc((in[0] + 1) * sizeof(int));
+  if (*out == NULL)
+  {
+    printf("Memory allocation failed.\n");
+    exit(1);
+  }
+
+  (*out)[0] = in[0];
+  for (int i = 1; i <= in[0]; i++)
+  {
+    (*out)[i] = in[i];
+  }
+}
