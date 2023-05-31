@@ -1,6 +1,6 @@
-CC = gcc
-CFLAGS = -O2 -Wall -fopenmp #-DDEBUG -DDEBUG_QUICKSORT_DETAIL
-LDFLAGS = -g -fopenmp 
+COMPILER ?= mpicc
+CFLAGS = -O2 -Wall -Wno-variadic-macros -pedantic#-DDEBUG -DDEBUG_QUICKSORT_DETAIL
+LDFLAGS = -g 
 LDLIBS =
 
 SRCDIR = C/src
@@ -14,10 +14,10 @@ EXECUTABLE = quicksort
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(COMPILER) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(COMPILER) $(CFLAGS) -c -o $@ $<
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)

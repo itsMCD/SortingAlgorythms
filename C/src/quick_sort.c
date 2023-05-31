@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <mpi.h>
 #include "array_io.h"
 
 #define MIN_SAMPLE_SIZE 16384
@@ -16,9 +17,38 @@ void swap_indices(int a, int b, int *array);
 /**
  * The main method for testing the sorting algorithm
  */
+int rank, size;
 int main(int argc, char *argv[])
 {
-  int *sort_me_centre = NULL;
+  int *array = NULL;
+  create_random_array(16, array);
+  quick_sort_concurrent(array);
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  
+  MPI_Finalize();
+}
+
+void quick_sort_concurrent(int *array)
+{
+  
+  int size_arr = 0;
+  if(rank == 0)
+  {
+    size_arr = array[0];
+  }
+  else{
+    size_arr = 0;
+  }
+  //send pointer of array to the other processors
+  MPI_Bcast(&size_arr, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  printf("rank %d recieved size %d: ",rank, size);
+  //we want all processes to recieve this array
+}
+
+void measure_serial() {
+int *sort_me_centre = NULL;
   int *sort_me_left = NULL;
   int *sort_me_right = NULL;
   clock_t start , diff_centre = 0, diff_left = 0, diff_right = 0;
@@ -48,7 +78,6 @@ int main(int argc, char *argv[])
     free(sort_me_right);
     }
   }
-  
 }
 
 void quick_sort_serial_centre_pivot(int *array)
