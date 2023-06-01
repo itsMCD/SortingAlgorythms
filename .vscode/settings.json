@@ -1,7 +1,8 @@
 {
   "files.associations": {
     "stdio.h": "c",
-    "array_io.h": "c"
+    "array_io.h": "c",
+    "array": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
