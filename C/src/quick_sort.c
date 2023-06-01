@@ -14,6 +14,8 @@ void recursive_quicksort_left_pivot(int low, int high, int *array);
 void quick_sort_serial_right_pivot(int *array);
 void recursive_quicksort_right_pivot(int low, int high, int *array);
 void swap_indices(int a, int b, int *array);
+void recursive_quick_sort_concurrent(int low, int high, int *array);
+void quick_sort_concurrent(int *array);
 /**
  * The main method for testing the sorting algorithm
  */
@@ -21,30 +23,82 @@ int rank, size;
 int main(int argc, char *argv[])
 {
   int *array = NULL;
-  create_random_array(16, array);
-  quick_sort_concurrent(array);
+  create_random_array(16, &array);
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   
+  quick_sort_concurrent(array);
+
   MPI_Finalize();
 }
 
 void quick_sort_concurrent(int *array)
 {
   
-  int size_arr = 0;
-  if(rank == 0)
-  {
-    size_arr = array[0];
-  }
-  else{
-    size_arr = 0;
-  }
+  int *local_array_pointer = array;
+  srand(time(NULL));
   //send pointer of array to the other processors
-  MPI_Bcast(&size_arr, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  printf("rank %d recieved size %d: ",rank, size);
   //we want all processes to recieve this array
+  MPI_Bcast(&local_array_pointer, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  if (rank == 0)
+  {
+    recursive_quick_sort_concurrent(1, array[0], local_array_pointer);
+  }
+  while (1)
+  {
+    int *bounds = malloc(2*sizeof(int));
+    MPI_Recv(bounds, 2, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    recursive_quick_sort_concurrent(bounds[0], bounds[1], local_array_pointer);
+  }
+}
+
+void recursive_quick_sort_concurrent(int low, int high, int *array)
+{
+  if (high - low < 1)
+  {
+    return;
+  }
+  if (high - low == 1)
+  {
+    if (array[low] > array[high])
+    {
+      swap_indices(low, high, array);
+    }
+  }
+  // Choose the pivot (for this centre)
+  int pivot_index = low + (high - low) / 2;
+  // move pivot to the final position
+  swap_indices(pivot_index, high, array);
+  int i = low, j = high - 1;
+  while (i < j)
+  {
+    // move left to first one larger than pivot
+    while (array[i] <= array[high] && i < high)
+    {
+      i++;
+    }
+    while (array[j] > array[high] && j > low)
+    {
+      j--;
+    }
+    if (i < j)
+    {
+      swap_indices(i, j, array);
+    }
+    j--;
+  }
+  swap_indices(i, high, array);
+  int *high_arr = malloc(2 * sizeof(int));
+  int *low_arr = malloc(2 * sizeof(int));
+  MPI_Request req1;
+  MPI_Request req2;
+  high_arr[0] = i + 1;
+  high_arr[1] = high;
+  low_arr[0] = low;
+  low_arr[1] = i-1;
+  MPI_Isend(low_arr, 2, MPI_INT, rand()%size, 0, MPI_COMM_WORLD,&req1);
+  MPI_Isend(high_arr, 2, MPI_INT, rand()%size, 0, MPI_COMM_WORLD,&req2);
 }
 
 void measure_serial() {
